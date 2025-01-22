@@ -46,9 +46,9 @@ namespace ChessUI
 
         private void DrawBoard(Board board)
         {
-            for (int r = 0; r <= 8; r++)
+            for (int r = 0; r < 8; r++)
             {
-                for (int c = 0; c <= 8; c++)
+                for (int c = 0; c < 8; c++)
                 {
                     Piece piece = board[r, c];
                     pieceImages[r,c].Source = Images.GetImage(piece);
