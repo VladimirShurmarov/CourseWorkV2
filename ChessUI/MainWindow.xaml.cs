@@ -113,7 +113,7 @@ namespace ChessUI
             }
         }
 
-        private void HandleMove(Move move)
+        private void HandleMove(Move move) // Функция выполнения хода
         {
             gameState.MakeMove(move);
             DrawBoard(gameState.Board);
