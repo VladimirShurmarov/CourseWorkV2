@@ -59,7 +59,7 @@ namespace ChessUI
                 for (int c = 0; c < 8; c++)
                 {
                     Piece piece = board[r, c];
-                    pieceImages[r,c].Source = Images.GetImage(piece);
+                    pieceImages[r, c].Source = Images.GetImage(piece);
                 }
             }
         }
@@ -90,7 +90,7 @@ namespace ChessUI
             double squareSize = BoardGrid.ActualWidth / 8;
             int row = (int)(point.Y / squareSize);
             int col = (int)(point.X / squareSize);
-            return new Position(row, col); 
+            return new Position(row, col);
         }
 
         // Обработка первого клика по фигуре (ее взятие)
@@ -116,7 +116,7 @@ namespace ChessUI
             {
                 if (move.Type == MoveType.PawnPromotion) // Если пешка попала в ячейки для повышения
                 {
-                    HandlePromotion(move.FromPos,move.ToPos); // Выбор типа повышения
+                    HandlePromotion(move.FromPos, move.ToPos); // Выбор типа повышения
                 }
                 else
                 {
@@ -217,11 +217,34 @@ namespace ChessUI
 
         private void RestartGame()
         {
+            selectedPos = null;
             HideHighlights();
             moveCache.Clear();
             gameState = new GameState(Player.White, Board.Initial());
             DrawBoard(gameState.Board);
             SetCursor(gameState.CurrentPlayer);
+        }
+
+        private void Window_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (!IsMenuOnScreen() && e.Key == Key.Escape)
+            {
+                ShowPauseMenu();
+            }
+        }
+        private void ShowPauseMenu()
+        {
+            PauseMenu pauseMenu = new PauseMenu();
+            MenuContainer.Content = pauseMenu;
+
+            pauseMenu.OptionSelected += option =>
+            {
+                MenuContainer.Content = null;
+                if (option == Option.Restart)
+                {
+                    RestartGame();
+                }
+            };
         }
     }
 }
