@@ -12,6 +12,8 @@ namespace ChessLogic
         public Player CurrentPlayer { get; private set; }
         public Result Result { get; private set; } = null;
 
+        private int noCaptureOrPawnMoves = 0; // Переменная для подсчета ходов для правила 50 ходов
+
         public GameState(Player player, Board board)
         {
             CurrentPlayer = player;
@@ -33,7 +35,16 @@ namespace ChessLogic
         public void MakeMove(Move move)
         {
             Board.SetPawnSkipPosition(CurrentPlayer, null); // Запрет на возможность взятия на проходе, если это не следующий ход за ходом 2 клетками
-            move.Execute(Board);
+            bool captureOrPawn = move.Execute(Board); // Проверка, была ли срублена фигура или сделали ли пешка ход для правило 50 ходов
+            if (captureOrPawn)
+            {
+                noCaptureOrPawnMoves = 0;
+            }
+            else
+            {
+                noCaptureOrPawnMoves++;
+            }
+
             CurrentPlayer = CurrentPlayer.Opponent();
             CheckForGameOver();
         }
@@ -66,11 +77,21 @@ namespace ChessLogic
             {
                 Result = Result.Draw(EndReason.InsufficientMaterial);
             }
+            else if (FiftyMoveRule())
+            {
+                Result = Result.Draw(EndReason.FiftyMoveRule); 
+            }
         }
 
         public bool IsGameOver()
         {
             return Result != null;
+        }
+
+        private bool FiftyMoveRule() // Правило 50 ходов 
+        {
+            int fullMoves = noCaptureOrPawnMoves / 2;
+            return fullMoves == 50;
         }
     }
 }

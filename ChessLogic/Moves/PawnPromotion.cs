@@ -33,7 +33,7 @@ namespace ChessLogic
             };
         }
 
-        public override void Execute(Board board)
+        public override bool Execute(Board board)
         {
             Piece pawn = board[FromPos];
             board[FromPos] = null;
@@ -41,6 +41,8 @@ namespace ChessLogic
             Piece promotionPiece = CreatePromotionPiece(pawn.Color);
             promotionPiece.HasMoved = true; // Устанавливается true, чтобы не допустить ходов, доступных только если фигура не двигалась
             board[ToPos] = promotionPiece;
+
+            return true; // Необходимо для сброса счета в правиле 50 ходов
         }
     }
 }

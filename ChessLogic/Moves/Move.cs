@@ -6,7 +6,7 @@
         public abstract Position FromPos { get; } // Определение начальных координат фигуры
         public abstract Position ToPos { get; } //  Определение конечных координат фигуры
 
-        public abstract void Execute(Board board);
+        public abstract bool Execute(Board board);
 
         public virtual bool IsLegal(Board board) // Определение допустимости хода (не оставит короля под угрозой)
         {
