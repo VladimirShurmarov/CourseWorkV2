@@ -28,6 +28,44 @@ namespace ChessLogic
             Color = color;
         }
 
+        private static bool IsUnmovedRook(Position pos, Board board) // Проверка условия для рокировки, что ладья не двигалась
+        {
+            if (board.IsEmpty(pos))
+            { return false; }
+
+            Piece piece = board[pos];
+            return piece.Type == PieceType.Rook && !piece.HasMoved;
+        }
+
+        private static bool AllEmpty(IEnumerable<Position> positions, Board board) // Проверка условия для рокировки, что между королем и ладьей ячейки пусты
+        {
+            return positions.All(pos => board.IsEmpty(pos));
+        }
+
+        private bool CanCastleKingSide(Position from, Board board) // Общая проверка условий для рокировки со стороны короля
+        {
+            if (HasMoved)
+            {
+                return false;
+            }
+            Position rookPos = new Position(from.Row, 7);
+            Position[] betweenPositions = new Position[] { new(from.Row, 5), new(from.Row, 6) };
+
+            return IsUnmovedRook(rookPos, board) && AllEmpty(betweenPositions, board);
+        }
+
+        private bool CanCastleQueenSide(Position from, Board board) // Общая проверка условия для рокировки со стороны ферзя
+        {
+            if (HasMoved)
+            { return false; }
+
+            Position rookPos = new Position(from.Row, 0);
+            Position[] betweenPositions = new Position[] { new(from.Row, 1), new(from.Row, 2), new(from.Row, 3) }; // Для стороны ферзя требуется на 1 свободную ячейку больше
+
+            return IsUnmovedRook(rookPos, board) && AllEmpty(betweenPositions, board);
+        }
+
+
         public override Piece Copy()
         {
             King copy = new King(Color);
@@ -53,12 +91,17 @@ namespace ChessLogic
             }    
         }
 
-        public override IEnumerable<Move> GetMoves(Position from, Board board)
+        public override IEnumerable<Move> GetMoves(Position from, Board board) // Варианты ходов короля
         {
             foreach (Position to in MovePositions(from,board))
             {
                 yield return new NormalMove(from, to);
             }
+
+            if (CanCastleKingSide(from, board)) // Проверка возможностей рокировки
+            { yield return new Castle(MoveType.CastleKS, from); }
+            if (CanCastleQueenSide(from, board))
+            { yield return new Castle(MoveType.CastleQS, from); }
         }
 
         public override bool CanCaptureOpponentKing(Position from, Board board)
