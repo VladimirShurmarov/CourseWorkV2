@@ -123,5 +123,55 @@ namespace ChessLogic
             }
             return copy;
         }
+        public Counting CountPieces() // Подсчет количества фигур
+        {
+            Counting counting = new Counting();
+
+            foreach (Position pos in PiecePositions())
+            {
+                Piece piece = this[pos];
+                counting.Increment(piece.Color, piece.Type);
+            }
+            return counting;
+        }
+
+        public bool InsufficientMaterial() // Проверка на достаточность фигур для мата
+        {
+            Counting counting = CountPieces();
+
+            return IsKingVKing(counting) || IsKingBishopVKing(counting) ||
+                IsKingKnightVKing(counting) || IsKingBishopVKingBishop(counting);
+        }
+
+        private static bool IsKingVKing(Counting counting) // Проверка если в игре остались только короли
+        {
+            return counting.TotalCount == 2;
+        }
+
+        public static bool IsKingBishopVKing(Counting counting) // Проверка если в игре остались только короли и 1 слон
+        {
+            return counting.TotalCount == 3 && (counting.White(PieceType.Bishop) == 1 || counting.Black(PieceType.Bishop) == 1);
+        }
+        public static bool IsKingKnightVKing(Counting counting) // Проверка если в игре остались только короли и 1 конь
+        {
+            return counting.TotalCount == 3 && (counting.White(PieceType.Knight) == 1 || counting.Black(PieceType.Knight) == 1);
+        }
+        public bool IsKingBishopVKingBishop(Counting counting) // Проверка если в игре остались только короли и 2 слона одинакового цвета
+        {
+            if (counting.TotalCount != 4)
+                return false;
+
+            if (counting.White(PieceType.Bishop) != 1 || counting.Black(PieceType.Bishop) != 1)
+                return false;
+
+            Position wBishopsPos = FindPiece(Player.White, PieceType.Bishop);
+            Position bBishopsPos = FindPiece(Player.Black, PieceType.Bishop);
+
+            return wBishopsPos.SquareColor() == bBishopsPos.SquareColor();
+        }
+        private Position FindPiece(Player color, PieceType type)
+        {
+            return PiecePositionsFor(color).First(pos => this[pos].Type == type);
+        }
     }
 }
