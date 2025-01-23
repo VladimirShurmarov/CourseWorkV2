@@ -114,8 +114,31 @@ namespace ChessUI
 
             if (moveCache.TryGetValue(pos, out Move move)) // Проверка на возможность хода
             {
-                HandleMove(move);
+                if (move.Type == MoveType.PawnPromotion) // Если пешка попала в ячейки для повышения
+                {
+                    HandlePromotion(move.FromPos,move.ToPos); // Выбор типа повышения
+                }
+                else
+                {
+                    HandleMove(move);
+                }
             }
+        }
+
+        private void HandlePromotion(Position from, Position to)
+        {
+            pieceImages[to.Row, to.Column].Source = Images.GetImage(gameState.CurrentPlayer, PieceType.Pawn);
+            pieceImages[from.Row, from.Column].Source = null;
+
+            PromotionMenu promMenu = new PromotionMenu(gameState.CurrentPlayer);
+            MenuContainer.Content = promMenu;
+
+            promMenu.PieceSelected += type =>
+            {
+                MenuContainer.Content = null;
+                Move promMove = new PawnPromotion(from, to, type);
+                HandleMove(promMove);
+            };
         }
 
         private void HandleMove(Move move) // Функция выполнения хода
