@@ -32,6 +32,7 @@ namespace ChessLogic
 
         public void MakeMove(Move move)
         {
+            Board.SetPawnSkipPosition(CurrentPlayer, null); // Запрет на возможность взятия на проходе, если это не следующий ход за ходом 2 клетками
             move.Execute(Board);
             CurrentPlayer = CurrentPlayer.Opponent();
             CheckForGameOver();

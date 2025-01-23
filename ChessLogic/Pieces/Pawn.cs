@@ -79,7 +79,7 @@ namespace ChessLogic
 
                 if (!HasMoved && CanMoveTo(twoMovesPos,board))
                 {
-                    yield return new NormalMove(from, twoMovesPos);
+                    yield return new DoublePawn(from, twoMovesPos);
                 }
             }
         }
@@ -90,7 +90,12 @@ namespace ChessLogic
             {
                 Position to = from + forward + dir;
 
-                if (CanCaptureAt(to, board)) // Проверка возможности срубить по диагонали
+                if (to == board.GetPawnSkipPosition(Color.Opponent())) // Проверка, ходила ли пешка оппонента на 2 клетки
+                {
+                    yield return new EnPassant(from, to);
+                }
+
+                else if (CanCaptureAt(to, board)) // Проверка возможности срубить по диагонали
                 {
                     if (to.Row == 0 || to.Row == 7) // Проверка необходимости повышения фигуры
                         foreach (Move promMove in PromotionMoves(from, to))
